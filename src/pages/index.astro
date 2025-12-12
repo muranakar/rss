@@ -141,11 +141,16 @@ const categories = [...new Set(items.map(item => item.category))];
 <body>
   <div class="container">
     <h1>📰 My Feed</h1>
-    {lastUpdated && (
-      <p class="last-updated">
-        最終更新: {new Date(lastUpdated).toLocaleString('ja-JP')}
-      </p>
-    )}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      {lastUpdated && (
+        <p class="last-updated" style="margin: 0;">
+          最終更新: {new Date(lastUpdated).toLocaleString('ja-JP')}
+        </p>
+      )}
+      <button id="refresh-btn" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+        🔄 今すぐ更新
+      </button>
+    </div>
 
     <div class="filters">
       <button class="filter-btn active" data-category="all">すべて</button>
@@ -204,6 +209,55 @@ const categories = [...new Set(items.map(item => item.category))];
           }
         });
       });
+    });
+
+    // 更新ボタンの機能
+    document.getElementById('refresh-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('refresh-btn');
+      btn.textContent = '⏳ 更新中...';
+      btn.disabled = true;
+
+      try {
+        // GitHub Actions APIを使ってワークフローをトリガー
+        const owner = 'muranakar';
+        const repo = 'rss';
+        const workflow_id = 'fetch-feeds.yml';
+        
+        // Personal Access Tokenが必要（GitHub Settingsで作成）
+        // 注意: このトークンは公開しないでください！
+        alert('GitHub Actions APIを使うには、Personal Access Tokenが必要です。\n\nGitHubの Actions タブから手動で "Run workflow" をクリックしてください。');
+        
+        // 代替案: ページをリロードして最新のfeeds.jsonを取得
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+        
+      } catch (error) {
+        console.error('更新エラー:', error);
+        btn.textContent = '❌ エラー';
+        setTimeout(() => {
+          btn.textContent = '🔄 今すぐ更新';
+          btn.disabled = false;
+        }, 2000);
+      }
+    });
+
+    // ページ読み込み時に自動チェック（オプション）
+    window.addEventListener('load', () => {
+      const lastUpdated = document.querySelector('.last-updated');
+      if (lastUpdated) {
+        const lastUpdateTime = new Date(lastUpdated.textContent.replace('最終更新: ', ''));
+        const now = new Date();
+        const hoursSinceUpdate = (now - lastUpdateTime) / (1000 * 60 * 60);
+        
+        // 6時間以上経過していたら通知
+        if (hoursSinceUpdate > 6) {
+          const updateNotice = document.createElement('div');
+          updateNotice.style.cssText = 'background: #fff3cd; color: #856404; padding: 10px; margin-bottom: 20px; border-radius: 4px;';
+          updateNotice.textContent = `⚠️ 最後の更新から${Math.floor(hoursSinceUpdate)}時間経過しています。更新ボタンをクリックして最新の記事を取得してください。`;
+          document.querySelector('.filters').before(updateNotice);
+        }
+      }
     });
   </script>
 </body>
