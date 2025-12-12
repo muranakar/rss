@@ -1,9 +1,11 @@
 name: Fetch RSS Feeds
 
 on:
-  # 毎日午前9時（日本時間）に実行
+  # 毎日午前9時、12時、午後18時（日本時間）に実行
   schedule:
     - cron: '0 0 * * *'  # UTC 0時 = 日本時間 午前9時
+    - cron: '0 3 * * *'  # UTC 3時 = 日本時間 午後12時
+    - cron: '0 9 * * *'  # UTC 9時 = 日本時間 午後18時
 
   # 手動実行も可能にする
   workflow_dispatch:
