@@ -1,0 +1,17 @@
+{
+  "name": "my-rss-feed",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "fetch-feeds": "node scripts/fetch.js"
+  },
+  "dependencies": {
+    "astro": "^4.0.0"
+  },
+  "devDependencies": {
+    "rss-parser": "^3.13.0"
+  }
+}
